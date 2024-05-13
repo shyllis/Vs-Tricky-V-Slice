@@ -1,0 +1,81 @@
+import flixel.FlxG;
+import flixel.FlxSprite;
+import funkin.Paths;
+import funkin.play.stage.Stage;
+import funkin.play.PlayState;
+import flixel.text.FlxText;
+import funkin.audio.FunkinSound;
+import funkin.Conductor;
+
+class HellClownStage extends Stage {
+	function new() {
+		super('nevadaSpook');
+	}
+
+	var tstatic:FlxSprite;
+
+	var spookySteps:Int = 0;
+	var spookyRendered:Bool = false;
+
+	var MAINLIGHT:FlxSprite;
+	
+	function onCreate(event:ScriptEvent) {
+		super.onCreate(event);
+
+		tstatic = new FlxSprite(0,0).loadGraphic(Paths.image('bgs/TrickyStatic'), true, 320, 180);
+		tstatic.antialiasing = true;
+		tstatic.animation.add('static', [0, 1, 2], 24, true);
+		tstatic.animation.play('static');
+		tstatic.setGraphicSize(Std.int(tstatic.width * 8));
+		tstatic.updateHitbox();
+		tstatic.screenCenter();
+
+		tstatic.alpha = 0;
+		
+		PlayState.instance.currentStage.add(tstatic);
+		PlayState.instance.currentStage.refresh();
+
+		tstatic.cameras = [PlayState.instance.camHUD];
+
+		spookyRendered = false;
+	}
+
+	function onUpdate(event:ScriptEvent) {
+		super.onUpdate(event);
+		if (spookyRendered) {
+			if (tstatic.alpha != 0)
+				tstatic.alpha = FlxG.random.float(0.1,0.5);
+		}
+
+		if (spookyRendered && spookySteps + 3 < Conductor.get_instance().currentStep) {
+			spookyRendered = false;
+			tstatic.alpha = 0;
+		}
+	}
+
+	function onNoteHit(event) {
+    	super.onNoteHit(event);
+
+    	if (event.judgement == "perfect") {
+			if (FlxG.random.bool(45) && !spookyRendered)
+				createStatic();
+  	    	PlayState.instance.vocals.set_playerVolume(1);
+		}
+	}
+
+	function resetStuff() {
+		spookyRendered = false;
+		tstatic.alpha = 0;
+	}
+
+	function createStatic():Void {
+		spookySteps = Conductor.get_instance().currentStep;
+		spookyRendered = true;
+		tstatic.alpha = 0.5;
+		FlxG.sound.play(Paths.sound('staticSound'));
+	}
+	
+    override function onSongRetry(event) {
+		resetStuff();
+    }
+}

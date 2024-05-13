@@ -1,0 +1,50 @@
+{
+    "version": "1.0.0",
+    "name": "Tricky",
+    "renderType": "multisparrow",
+    "assetPath": "characters/tricky",
+    "flipX": false,
+    "singTime": 4,
+    "animations": [
+        {
+            "name": "idle",
+            "prefix": "Idle",
+            "offsets": [
+                0,
+                -75
+            ]
+        },
+        {
+            "name": "singUP",
+            "prefix": "Sing Up",
+            "offsets": [
+                93,
+                -76
+            ]
+        },
+        {
+            "name": "singRIGHT",
+            "prefix": "Sing Right",
+            "offsets": [
+                16,
+                -176
+            ]
+        },
+        {
+            "name": "singDOWN",
+            "prefix": "Sing Down",
+            "offsets": [
+                6,
+                -84
+            ]
+        },
+        {
+            "name": "singLEFT",
+            "prefix": "Sing Left",
+            "offsets": [
+                103,
+                -72
+            ]
+        }
+    ]
+}

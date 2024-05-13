@@ -1,0 +1,23 @@
+import flixel.FlxG;
+import flixel.FlxSprite;
+import funkin.Paths;
+import funkin.play.character.MultiSparrowCharacter;
+import funkin.play.GameOverSubState;
+import funkin.play.PlayState;
+
+class TrickyMaskChar extends MultiSparrowCharacter {
+	function new() {
+		super('trickyMask');
+	}
+	
+	function onCreate(event:ScriptEvent) {
+		super.onCreate(event);
+
+		GameOverSubState.musicSuffix = 'Trickster';
+		GameOverSubState.blueBallSuffix = '-sign';
+	}
+
+	function onUpdate(event:ScriptEvent) {
+		super.onUpdate(event);
+	}
+}

@@ -1,0 +1,67 @@
+import funkin.play.song.Song;
+import funkin.play.PlayState;
+import funkin.Paths;
+import funkin.play.cutscene.VideoCutscene;
+import funkin.play.cutscene.CutsceneType;
+import funkin.play.PlayStatePlaylist;
+
+class HellClownSong extends Song {
+  	var hasPlayedCutscene:Bool;
+
+  	public function new(){
+    	super('hellclown');
+    
+    	hasPlayedCutscene = false;
+  	}
+  
+  	public override function onCountdownStart(event:CountdownScriptEvent):Void {
+		super.onCountdownStart(event);
+	  
+		if (!PlayStatePlaylist.isStoryMode)
+     		hasPlayedCutscene = true;
+      
+    	if(!hasPlayedCutscene) { 
+    		hasPlayedCutscene = true;
+      
+      		//event.cancel();
+
+      		//VideoCutscene.play(Paths.videos('HELLCLOWN_ENGADGED'));
+		}
+  	}
+
+  	function onSongRetry(event:ScriptEvent) {
+    	super.onSongRetry(event);
+
+    	hasPlayedCutscene = true;
+  	}
+
+  	function onCreate(event:ScriptEvent):Void {
+    	super.onCreate(event);
+
+    	hasPlayedCutscene = false;
+  	}
+
+	function onSongEnd(event:CountdownScriptEvent) {
+		super.onSongEnd(event);
+
+     	hasPlayedCutscene = false;
+		
+		if (!PlayStatePlaylist.isStoryMode)
+     		hasPlayedCutscene = true;
+      
+    	if(!hasPlayedCutscene) { 
+    		hasPlayedCutscene = true;
+      
+      		//event.cancel();
+
+			//PlayState.instance.camHUD.visible = false;
+
+			//PlayState.instance.isInCutscene = true;
+
+			//PlayState.instance.currentStage.getBoyfriend().danceEvery = 0;
+			//PlayState.instance.currentStage.getDad().danceEvery = 0;
+
+      		//VideoCutscene.play(Paths.videos('HELLCLOWN_ENGADGED', CutsceneType.ENDING));
+		}
+	}
+}

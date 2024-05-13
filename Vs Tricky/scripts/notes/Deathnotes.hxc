@@ -1,0 +1,59 @@
+import funkin.modding.module.Module;
+import funkin.play.PlayState;
+import funkin.Paths;
+import funkin.audio.FunkinSound;
+import funkin.Preferences;
+
+class DeathNotes extends Module {
+    function new(){
+        super("Deathnotes");
+    }
+	
+	function onNoteHit(event) {
+    	if (event.judgement == "perfect") {
+    		super.onNoteHit(event);
+			return;
+		}
+
+		if (event.note.noteData.kind == "trickydeath") {
+			// a little more fair
+			if (event.judgement == "sick" || event.judgement == "good") {
+				FunkinSound.playOnce(Paths.sound('death'));
+				PlayState.instance.health = -1;
+			}
+			event.cancelEvent();
+		}
+	}
+	
+	function onNoteIncoming(event) {
+		if (event.note.noteData.kind == "trickydeath") {
+			event.note.frames = Paths.getSparrowAtlas('notes/NOTE_death');
+			event.note.animation.addByPrefix('greenScroll', 'Green Arrow');
+			event.note.animation.addByPrefix('redScroll', 'Red Arrow');
+			event.note.animation.addByPrefix('blueScroll', 'Blue Arrow');
+			event.note.animation.addByPrefix('purpleScroll', 'Purple Arrow');
+
+			event.note.setGraphicSize(Std.int(event.note.width * 0.65));
+			event.note.updateHitbox();
+			event.note.offset.set(260, 100);
+
+			var penis:String;
+
+			if(event.note.noteData.data % 4 == 0)
+				penis = "purpleScroll";
+			if(event.note.noteData.data % 4 == 1)
+				penis = "blueScroll";
+			if(event.note.noteData.data % 4 == 2)
+				penis = "greenScroll";
+			if(event.note.noteData.data % 4 == 3)
+				penis = "redScroll";
+
+			event.note.animation.play(penis);
+		}
+	}
+	
+	function onNoteMiss(event) {
+		if (event.note.noteData.kind == "trickydeath")
+			event.cancelEvent();
+	}
+}

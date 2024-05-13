@@ -1,0 +1,127 @@
+// hi wess<3
+
+import flixel.FlxG;
+import flixel.FlxSprite;
+import funkin.Paths;
+import funkin.play.stage.Stage;
+import funkin.play.PlayState;
+import flixel.text.FlxText;
+import funkin.audio.FunkinSound;
+import funkin.Conductor;
+
+class NevadaMadnessStage extends Stage {
+	function new() {
+		super('nevadaM');
+	}
+
+	var tstatic:FlxSprite;
+
+	var TrickyLinesSing:Array<String> = ["SUFFER","INCORRECT", "INCOMPLETE", "INSUFFICIENT", "INVALID", "CORRECTION", "MISTAKE", "REDUCE", "ERROR", "ADJUSTING", "IMPROBABLE", "IMPLAUSIBLE", "MISJUDGED"];
+	var TrickyLinesMiss:Array<String> = ["TERRIBLE", "WASTE", "MISS CALCULTED", "PREDICTED", "FAILURE", "DISGUSTING", "ABHORRENT", "FORESEEN", "CONTEMPTIBLE", "PROGNOSTICATE", "DISPICABLE", "REPREHENSIBLE"];
+	var spookySteps:Int = 0;
+	var spookyRendered:Bool = false;
+	var spookyText:FlxText;
+	var resetSpookyText:Bool = true;
+
+	var MAINLIGHT:FlxSprite;
+	
+	function onCreate(event:ScriptEvent) {
+		super.onCreate(event);
+
+		tstatic = new FlxSprite(0,0).loadGraphic(Paths.image('bgs/TrickyStatic'), true, 320, 180);
+		tstatic.antialiasing = true;
+		tstatic.animation.add('static', [0, 1, 2], 24, true);
+		tstatic.animation.play('static');
+		tstatic.setGraphicSize(Std.int(tstatic.width * 8));
+		tstatic.updateHitbox();
+		tstatic.screenCenter();
+
+		tstatic.alpha = 0;
+
+		MAINLIGHT = new FlxSprite(-470, -150).loadGraphic(Paths.image('bgs/default/hue'));
+		MAINLIGHT.alpha = 0.7;
+		MAINLIGHT.setGraphicSize(Std.int(MAINLIGHT.width * 0.9));
+		MAINLIGHT.blend = "screen";
+		MAINLIGHT.updateHitbox();
+		MAINLIGHT.antialiasing = true;
+		MAINLIGHT.scrollFactor.set(1.2, 1.2);
+
+		PlayState.instance.currentStage.add(spookyText);
+		PlayState.instance.currentStage.add(tstatic);
+		PlayState.instance.currentStage.add(MAINLIGHT);
+		PlayState.instance.currentStage.refresh();
+
+		tstatic.cameras = [PlayState.instance.camHUD];
+		MAINLIGHT.cameras = [PlayState.instance.camHUD];
+
+		spookyRendered = false;
+	}
+
+	function onUpdate(event:ScriptEvent) {
+		super.onUpdate(event);
+		if (spookyRendered) {
+			spookyText.angle = FlxG.random.int(-5,5); 
+
+			if (tstatic.alpha != 0)
+				tstatic.alpha = FlxG.random.float(0.1,0.5);
+		}
+
+		if (spookyRendered && spookySteps + 3 < Conductor.get_instance().currentStep) {
+			if (resetSpookyText) {
+				PlayState.instance.currentStage.remove(spookyText);
+				spookyRendered = false;
+			}
+			tstatic.alpha = 0;
+		}
+	}
+
+	function onNoteHit(event) {
+    	super.onNoteHit(event);
+
+    	if (event.judgement == "perfect") {
+			if (FlxG.random.bool(20) && !spookyRendered)
+				createSpookyText(TrickyLinesSing[FlxG.random.int(0, TrickyLinesSing.length)], -1111111111111, -1111111111111);
+  	    	PlayState.instance.vocals.set_playerVolume(1);
+		}
+	}
+
+	function resetSpookyTextManual():Void {
+		spookySteps = Conductor.get_instance().currentStep;
+		spookyRendered = true;
+		tstatic.alpha = 0.5;
+		FlxG.sound.play(Paths.sound('staticSound'));
+		resetSpookyText = true;
+	}
+
+	function manuallymanuallyresetspookytextmanual() {
+		PlayState.instance.currentStage.remove(spookyText);
+		spookyRendered = false;
+		tstatic.alpha = 0;
+	}
+
+	function createSpookyText(text:String, posx:Float = -1111111111111, posy:Float = -1111111111111):Void {
+		spookySteps = Conductor.get_instance().currentStep;
+		spookyRendered = true;
+		tstatic.alpha = 0.5;
+		FlxG.sound.play(Paths.sound('staticSound'));
+
+		spookyText = new FlxText((posx == -1111111111111 ? FlxG.random.float(850 + 40, 850 + 120) : posx),
+			(posy == -1111111111111 ? FlxG.random.float(550 + 200, 550 + 300) : posy));
+		spookyText.setFormat(Paths.font("impact.ttf"), 128, 0xFFFF0000);
+		spookyText.bold = true;
+		spookyText.zIndex = 302;
+		spookyText.text = text;
+		PlayState.instance.currentStage.add(spookyText);
+	}
+
+	function onNoteMiss(event) {
+    	super.onNoteMiss(event);
+		
+		if (FlxG.random.bool(10) && !spookyRendered)
+			createSpookyText(TrickyLinesMiss[FlxG.random.int(0, TrickyLinesMiss.length)]);
+	}
+	
+    override function onSongRetry(event) {
+		manuallymanuallyresetspookytextmanual();
+    }
+}

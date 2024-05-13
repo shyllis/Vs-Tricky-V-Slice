@@ -1,0 +1,185 @@
+import funkin.play.song.Song;
+import funkin.play.PlayState;
+import funkin.play.PlayStatePlaylist;
+import funkin.graphics.FunkinSprite;
+import funkin.audio.FunkinSound;
+import flixel.text.FlxText;
+import funkin.Paths;
+import flixel.FlxSprite;
+import flixel.util.FlxTimer;
+import flixel.tweens.FlxTween;
+import flixel.tweens.FlxEase;
+import flixel.FlxG;
+import funkin.data.event.SongEventRegistry;
+import funkin.Conductor;
+import flixel.math.FlxMath;
+
+class ExpurgationSong extends Song {
+  	public function new() {
+    	super('expurgation');
+    
+    	hasPlayedCutscene = false;
+  	}
+
+	function onCreate(event:ScriptEvent) {
+		super.onCreate(event);
+
+		// some optimization
+		FlxG.bitmap.add(Paths.image('mechanics/HP GREMLIN'));
+		FlxG.bitmap.add(Paths.image('mechanics/Sign_Post_Mechanic'));
+		FlxG.bitmap.add(Paths.image('notes/NOTE_death'));
+
+    	hasPlayedCutscene = false;
+	}
+
+  	var p:FunkinSound;
+  	var pp:FunkinSound;
+  	var hasPlayedCutscene:Bool;
+  
+  	public override function onCountdownStart(event:CountdownScriptEvent):Void {
+	  	super.onCountdownStart(event);
+	  
+    	if(!hasPlayedCutscene) {
+      		hasPlayedCutscene = true;
+      		PlayState.instance.currentStage.getDad().alpha = 0.000001;
+      
+      		event.cancel();
+      
+      		playCutscene();
+
+			return;
+    	}		
+		
+		new FlxTimer().start(25, function(tmr:FlxTimer) {
+			if (Conductor.get_instance().currentStep < 2400) {
+				if (PlayState.instance.mayPauseGame && !PlayState.instance.get_isGamePaused() && PlayState.instance.health >= 1.5)
+					doGremlin(40, 3, false);
+				tmr.reset(25);
+			}
+		});
+	}
+	
+  	function playCutscene() {
+		PlayState.instance.isInCutscene = true;
+
+  		var camPosDAD:Array<Float> = [PlayState.instance.currentStage.getDad().cameraFocusPoint.x, PlayState.instance.currentStage.getDad().cameraFocusPoint.y];
+
+		p = FunkinSound.load(Paths.sound('expurgation/Trickyspawn'));
+		pp = FunkinSound.load(Paths.sound('expurgation/TrickyGlitch'));
+		PlayState.instance.tweenCameraToPosition(camPosDAD[0], camPosDAD[1], 0, FlxEase.quadInOut);
+		
+		var spawnAnim = FunkinSprite.createSparrow(700, 240, 'bgs/expurgation/EXENTER','clown');
+		spawnAnim.animation.addByPrefix('start', 'Entrance', 24, false);
+		PlayState.instance.add(spawnAnim);
+
+		spawnAnim.animation.play('start');
+
+		p.play();
+		spawnAnim.animation.finishCallback = function(pog:String) {
+			pp.fadeOut();
+			PlayState.instance.currentStage.getDad().alpha = 1;
+			PlayState.instance.remove(spawnAnim);
+			PlayState.instance.isInCutscene = false;
+			PlayState.instance.startCountdown();
+		}
+
+		new FlxTimer().start(0.001, function(tmr:FlxTimer) {
+			if (spawnAnim.animation.frameIndex == 24)
+				pp.play();
+			else
+				tmr.reset(0.001);
+		});
+	}
+
+  	function onSongRetry(event:ScriptEvent) {
+		super.onSongRetry(event);
+
+    	hasPlayedCutscene = false;
+  	}
+
+	var theDuration:Int = 0; // i had to do this for some fucking reason
+	var interupt:Bool = false;
+	public static var totalDamageTaken:float = 0;
+
+	function doGremlin(hpToTake:Int, duration:Int) {
+		theDuration = duration;
+		interupt = false;
+
+		var gramlan:FlxSprite = FunkinSprite.createSparrow(0, 0,'mechanics/HP GREMLIN');
+		gramlan.setGraphicSize(Std.int(gramlan.width * 0.76));
+		gramlan.cameras = [PlayState.instance.camHUD];
+		gramlan.zIndex = 1500;
+
+		gramlan.x = PlayState.instance.iconP1.x;
+		gramlan.y = PlayState.instance.healthBarBG.y - 325;
+
+		gramlan.animation.addByIndices('come','HP Gremlin ANIMATION',[0,1], "", 24, false);
+		gramlan.animation.addByIndices('grab','HP Gremlin ANIMATION',[2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24], "", 24, false);
+		gramlan.animation.addByIndices('hold','HP Gremlin ANIMATION',[25,26,27,28],"",24);
+		gramlan.animation.addByIndices('release','HP Gremlin ANIMATION',[29,30,31,32,33],"",24,false);
+
+		gramlan.antialiasing = true;
+		PlayState.instance.add(gramlan);
+
+		if(FlxG.save.data.downscroll) {
+			gramlan.flipY = true;
+			gramlan.y -= 150;
+		}
+
+		var startHealth = PlayState.instance.health;
+		var toHealth = (hpToTake / 100) * startHealth; // simple math, convert it to a percentage then get the percentage of the health
+
+		var perct = toHealth / 2 * 100;
+
+		FunkinSound.playOnce(Paths.sound('expurgation/GremlinWoosh'));
+
+		gramlan.animation.play('come');
+		new FlxTimer().start(0.14, function(tmr:FlxTimer) {
+			gramlan.animation.play('grab');
+			FlxTween.tween(gramlan,{x: PlayState.instance.iconP1.x - 140},1,{ease: FlxEase.elasticIn, onComplete: function(tween:FlxTween) {
+				gramlan.animation.play('hold');
+				FlxTween.tween(gramlan,{
+					x: (PlayState.instance.healthBar.x + 
+					(PlayState.instance.healthBar.width * (FlxMath.remapToRange(perct, 0, 100, 100, 0) * 0.01) 
+					- 26)) - 75}, theDuration,
+				{
+					onUpdate: function(tween:FlxTween) { 
+						if (interupt) {
+							gramlan.animation.play('release');
+							gramlan.animation.finishCallback = function(pog:String) { gramlan.alpha = 0;}
+						} else {
+							var pp = FlxMath.lerp(startHealth,toHealth, tween.percent);
+							if (pp <= 0)
+								pp = 0.1;
+							PlayState.instance.health = pp;
+						}
+					},
+					onComplete: function(tween:FlxTween) {
+						if (interupt) {
+							PlayState.instance.remove(gramlan);
+						} else {
+							gramlan.animation.play('release');
+							gramlan.animation.finishCallback = function(pog:String) { PlayState.instance.remove(gramlan);}
+						}
+					}
+				});
+			}});
+		});
+	}
+
+	function onNoteHit(event) {
+    	super.onNoteHit(event);
+	
+    	if (event.judgement == "bad" || event.judgement == "shit")
+			interupt = true;
+	}
+	
+	function onNoteMiss(event) {
+    	super.onNoteMiss(event);
+
+		if (event.note.noteData.kind != "trickydeath") {
+			totalDamageTaken += 0.075;
+			interupt = true;
+		}
+	}
+}

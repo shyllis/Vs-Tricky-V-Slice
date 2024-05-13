@@ -1,0 +1,11 @@
+{
+  "title": "Vs Tricky",
+  "description": "Vs Tricky FNF port",
+  "contributors": [{
+    "name": "shyllis",
+    "name": "sector"
+  }],
+  "api_version": "0.1.0",
+  "mod_version": "1.0.0",
+  "license": "Apache-2.0"
+}

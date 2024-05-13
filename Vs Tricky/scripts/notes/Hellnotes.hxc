@@ -1,0 +1,80 @@
+import funkin.modding.module.Module;
+import funkin.play.PlayState;
+import funkin.Paths;
+import funkin.audio.FunkinSound;
+import funkin.Preferences;
+import flixel.FlxSprite;
+
+class HellNotes extends Module {
+    function new() {
+        super("trickyhell");
+    }
+	
+	function onNoteHit(event) {
+    	if (event.judgement == "perfect") {
+    		super.onNoteHit(event);
+			return;
+		}
+
+		if (event.note.noteData.kind == "trickyhell") {
+			FunkinSound.playOnce(Paths.sound('burnSound'));
+			PlayState.instance.health -= 0.45;
+        	PlayState.instance.playerStrumline.hitNote(event.note, true);
+
+			//var smoke:FlxSprite = new FlxSprite(event.note.x, PlayState.instance.playerStrumline.y);
+			//smoke.frames = Paths.getSparrowAtlas('notes/SmokeSplash');
+			//smoke.animation.addByPrefix('boom', 'smoke', 24, false);
+			//smoke.animation.play('boom');
+			//smoke.setGraphicSize(Std.int(smoke.width * 0.6));
+			//smoke.updateHitbox();
+			//smoke.zIndex = 1002;
+			//smoke.cameras = [PlayState.instance.camHUD];
+			//PlayState.instance.currentStage.add(smoke);
+			//smoke.animation.finishCallback = function(name:String) {
+			//	PlayState.instance.currentStage.remove(smoke);	
+			//}
+
+			event.cancelEvent();
+		}
+	}
+	
+	function onNoteIncoming(event) {
+		if (event.note.noteData.kind == "trickyhell") {
+			event.note.frames = Paths.getSparrowAtlas('notes/NOTE_fire');
+
+			if(!Preferences.get_downscroll()) {
+				event.note.animation.addByPrefix('blueScroll', 'blue fire');
+				event.note.animation.addByPrefix('greenScroll', 'green fire');
+			} else {
+				event.note.animation.addByPrefix('greenScroll', 'blue fire');
+				event.note.animation.addByPrefix('blueScroll', 'green fire');
+			}
+
+			event.note.animation.addByPrefix('redScroll', 'red fire');
+			event.note.animation.addByPrefix('purpleScroll', 'purple fire');
+
+			if(Preferences.get_downscroll())
+				event.note.flipY = true;
+
+			event.note.offset.set(93, 145);
+
+			var penis:String;
+
+			if(event.note.noteData.data % 4 == 0)
+				penis = "purpleScroll";
+			if(event.note.noteData.data % 4 == 1)
+				penis = "blueScroll";
+			if(event.note.noteData.data % 4 == 2)
+				penis = "greenScroll";
+			if(event.note.noteData.data % 4 == 3)
+				penis = "redScroll";
+
+			event.note.animation.play(penis);
+		}
+	}
+	
+	function onNoteMiss(event) {
+		if (event.note.noteData.kind == "trickyhell") 
+			event.cancelEvent();
+	}
+}

@@ -1,0 +1,154 @@
+import flixel.FlxG;
+import flixel.FlxSprite;
+import funkin.graphics.FunkinSprite;
+import funkin.Paths;
+import funkin.play.stage.Stage;
+import funkin.play.PlayState;
+import flixel.text.FlxText;
+import funkin.audio.FunkinSound;
+import funkin.Conductor;
+
+class AuditorHellStage extends Stage {
+	function new() {
+		super('auditorHell');
+	}
+
+	var tstatic:FlxSprite;
+
+	var ExTrickyLinesSing:Array<String> = ["YOU AREN'T HANK", "WHERE IS HANK", "HANK???", "WHO ARE YOU", "WHERE AM I", "THIS ISN'T RIGHT", "MIDGET", "SYSTEM UNRESPONSIVE", "WHY CAN'T I KILL?????"];
+	var spookySteps:Int = 0;
+	var spookyRendered:Bool = false;
+	var spookyText:FlxText;
+	var resetSpookyText:Bool = true;
+
+	var exSpikes:FlxSprite;
+	var cloneOne:FlxSprite;
+	var cloneTwo:FlxSprite;
+	
+	function onCreate(event:ScriptEvent) {
+		super.onCreate(event);
+		
+		tstatic = new FlxSprite(0,0).loadGraphic(Paths.image('bgs/TrickyStatic'), true, 320, 180);
+		tstatic.antialiasing = true;
+		tstatic.animation.add('static', [0, 1, 2], 24, true);
+		tstatic.animation.play('static');
+		tstatic.setGraphicSize(Std.int(tstatic.width * 8));
+		tstatic.updateHitbox();
+		tstatic.screenCenter();
+
+		tstatic.alpha = 0.1;
+
+		exSpikes = FunkinSprite.createSparrow(x - 350, y - 170, 'bgs/expurgation/FloorSpikes');
+		exSpikes.visible = false;
+
+		exSpikes.animation.addByPrefix('spike','Floor Spikes', 24, false);
+		
+		cloneOne = FunkinSprite.createSparrow(0, 0, 'bgs/expurgation/Clone');
+		cloneTwo = FunkinSprite.createSparrow(0, 0, 'bgs/expurgation/Clone');
+		cloneOne.alpha = 0;
+		cloneTwo.alpha = 0;
+		cloneOne.zIndex = 201;
+		cloneTwo.zIndex = 201;
+		cloneOne.animation.addByPrefix('clone', 'Clone', 24, false);
+		cloneTwo.animation.addByPrefix('clone', 'Clone', 24, false);
+
+		PlayState.instance.currentStage.add(tstatic);
+		PlayState.instance.currentStage.add(cloneOne);
+		PlayState.instance.currentStage.add(cloneTwo);
+		PlayState.instance.currentStage.refresh();
+		tstatic.cameras = [PlayState.instance.camHUD];
+
+		spookyRendered = false;
+	}
+
+	var beatOfFuck:Int = 0;
+
+	function onUpdate(event:ScriptEvent) {
+		super.onUpdate(event);
+		if (spookyRendered) {
+			spookyText.angle = FlxG.random.int(-5,5); 
+
+			if (tstatic.alpha != 0)
+				tstatic.alpha = FlxG.random.float(0.1,0.5);
+		}
+
+		if (spookyRendered && spookySteps + 3 < Conductor.get_instance().currentStep) {
+			if (resetSpookyText) {
+				PlayState.instance.currentStage.remove(spookyText);
+				spookyRendered = false;
+			}
+			tstatic.alpha = 0.1;
+		}
+		
+		if (Conductor.get_instance().currentBeat % 8 == 4 && beatOfFuck != Conductor.get_instance().currentBeat) {
+			beatOfFuck = Conductor.get_instance().currentBeat;
+			doClone(FlxG.random.int(0,1));
+		}
+	}
+
+	function doClone(side:Int) {
+		switch(side) {
+			case 0:
+				if (cloneOne.alpha == 1)
+					return;
+				cloneOne.x = 700 - 20;
+				cloneOne.y = 480;
+				cloneOne.alpha = 1;
+
+				cloneOne.animation.play('clone');
+				cloneOne.animation.finishCallback = function(pog:String) {cloneOne.alpha = 0;}
+			case 1:
+				if (cloneTwo.alpha == 1)
+					return;
+				cloneTwo.x = 700 + 390;
+				cloneTwo.y = 480;
+				cloneTwo.alpha = 1;
+
+				cloneTwo.animation.play('clone');
+				cloneTwo.animation.finishCallback = function(pog:String) {cloneTwo.alpha = 0;}
+		}
+	}
+
+	function onNoteHit(event) {
+    	super.onNoteHit(event);
+
+    	if (event.judgement == "perfect") {
+			if (FlxG.random.bool(60) && !spookyRendered)
+				createSpookyText(ExTrickyLinesSing[FlxG.random.int(0, ExTrickyLinesSing.length)], -1111111111111, -1111111111111);
+  	    	PlayState.instance.vocals.set_playerVolume(1);
+		}
+	}
+
+	function resetSpookyTextManual():Void {
+		spookySteps = Conductor.get_instance().currentStep;
+		spookyRendered = true;
+		tstatic.alpha = 0.5;
+		FlxG.sound.play(Paths.sound('staticSound'));
+		resetSpookyText = true;
+	}
+
+	function manuallymanuallyresetspookytextmanual() {
+		PlayState.instance.currentStage.remove(spookyText);
+		spookyRendered = false;
+		tstatic.alpha = 0.1;
+	}
+
+	function createSpookyText(text:String, posx:Float = -1111111111111, posy:Float = -1111111111111):Void {
+		spookySteps = Conductor.get_instance().currentStep;
+		spookyRendered = true;
+		tstatic.alpha = 0.5;
+		FlxG.sound.play(Paths.sound('staticSound'));
+
+		spookyText = new FlxText((posx == -1111111111111 ? FlxG.random.float(760 + 40, 760 + 120) : posx),
+			(posy == -1111111111111 ? FlxG.random.float(500 + 200, 500 + 300) : posy));
+		spookyText.setFormat(Paths.font("impact.ttf"), 128, 0xFFFF0000);
+		spookyText.bold = true;
+		spookyText.zIndex = 302;
+		spookyText.text = text;
+		PlayState.instance.currentStage.add(spookyText);
+	}
+
+    override function onSongRetry(event) {
+		manuallymanuallyresetspookytextmanual();
+    }
+}

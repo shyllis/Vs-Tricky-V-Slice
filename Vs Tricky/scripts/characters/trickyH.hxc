@@ -1,0 +1,40 @@
+import flixel.FlxG;
+import flixel.FlxSprite;
+import funkin.Paths;
+import funkin.play.character.BaseCharacter;
+import funkin.play.character.MultiSparrowCharacter;
+import funkin.play.GameOverSubState;
+import funkin.play.PlayState;
+
+import funkin.play.character.CharacterDataParser;
+import funkin.play.character.CharacterType;
+
+class HellClownChar extends MultiSparrowCharacter {
+	function new() {
+		super('trickyH');
+	}
+	
+    public override function onCountdownStart(event) {
+        super.onCountdownStart(event);
+
+		// some optimization
+		FlxG.bitmap.add(Paths.image('characters/Tricky/Left'));
+		FlxG.bitmap.add(Paths.image('characters/Tricky/Right'));
+		FlxG.bitmap.add(Paths.image('characters/Tricky/Down'));
+		FlxG.bitmap.add(Paths.image('characters/Tricky/Up'));
+    }
+
+	function onCreate(event:ScriptEvent) {
+		super.onCreate(event);
+
+		GameOverSubState.musicSuffix = 'Trickster';
+		GameOverSubState.blueBallSuffix = '-sign';
+	}
+
+	function onUpdate(event:ScriptEvent) {
+		super.onUpdate(event);
+		
+		if (PlayState.instance.currentStage.getDad().isSinging())
+			FlxG.camera.shake(0.02,0.2);
+	}
+}
