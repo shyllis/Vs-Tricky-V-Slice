@@ -17,24 +17,23 @@ class HellNotes extends Module {
 		}
 
 		if (event.note.noteData.kind == "trickyhell") {
+			event.cancelEvent();
+
 			FunkinSound.playOnce(Paths.sound('burnSound'));
 			PlayState.instance.health -= 0.45;
-        	PlayState.instance.playerStrumline.hitNote(event.note, true);
 
-			//var smoke:FlxSprite = new FlxSprite(event.note.x, PlayState.instance.playerStrumline.y);
-			//smoke.frames = Paths.getSparrowAtlas('notes/SmokeSplash');
-			//smoke.animation.addByPrefix('boom', 'smoke', 24, false);
-			//smoke.animation.play('boom');
-			//smoke.setGraphicSize(Std.int(smoke.width * 0.6));
-			//smoke.updateHitbox();
-			//smoke.zIndex = 1002;
-			//smoke.cameras = [PlayState.instance.camHUD];
-			//PlayState.instance.currentStage.add(smoke);
-			//smoke.animation.finishCallback = function(name:String) {
-			//	PlayState.instance.currentStage.remove(smoke);	
-			//}
-
-			event.cancelEvent();
+			var smoke:FlxSprite = new FlxSprite(event.note.x + 700, PlayState.instance.playerStrumline.y - 10);
+			smoke.frames = Paths.getSparrowAtlas('notes/SmokeSplash');
+			smoke.animation.addByPrefix('boom', 'smoke', 24, false);
+			smoke.animation.play('boom');
+			smoke.setGraphicSize(Std.int(smoke.width * 0.6));
+			smoke.updateHitbox();
+			smoke.zIndex = 1002;
+			smoke.cameras = [PlayState.instance.camHUD];
+			PlayState.instance.add(smoke);
+			smoke.animation.finishCallback = function(name:String) {
+				PlayState.instance.remove(smoke);	
+			}
 		}
 	}
 	

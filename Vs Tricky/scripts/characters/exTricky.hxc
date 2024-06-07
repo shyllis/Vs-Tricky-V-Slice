@@ -9,17 +9,6 @@ class ExpurgationChar extends MultiSparrowCharacter {
 	function new() {
 		super('exTricky');
 	}
-	
-	function onCreate(event:ScriptEvent) {
-		super.onCreate(event);
-
-		GameOverSubState.musicSuffix = 'Trickster';
-		GameOverSubState.blueBallSuffix = '-sign';
-	}
-
-	function onUpdate(event:ScriptEvent) {
-		super.onUpdate(event);
-	}
 
 	function onNoteHit(event:HitNoteScriptEvent) {
 		super.onNoteHit(event);

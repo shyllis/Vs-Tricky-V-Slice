@@ -5,7 +5,6 @@ import funkin.graphics.FunkinSprite;
 import funkin.audio.FunkinSound;
 import flixel.text.FlxText;
 import funkin.Paths;
-import flixel.FlxSprite;
 import flixel.util.FlxTimer;
 import flixel.tweens.FlxTween;
 import flixel.tweens.FlxEase;
@@ -22,12 +21,11 @@ class ExpurgationSong extends Song {
   	}
 
 	function onCreate(event:ScriptEvent) {
-		super.onCreate(event);
+		FunkinSprite.cacheTexture(Paths.image('mechanics/HP GREMLIN'));
+		FunkinSprite.cacheTexture(Paths.image('mechanics/Sign_Post_Mechanic'));
+		FunkinSprite.cacheTexture(Paths.image('notes/NOTE_death'));
 
-		// some optimization
-		FlxG.bitmap.add(Paths.image('mechanics/HP GREMLIN'));
-		FlxG.bitmap.add(Paths.image('mechanics/Sign_Post_Mechanic'));
-		FlxG.bitmap.add(Paths.image('notes/NOTE_death'));
+		super.onCreate(event);
 
     	hasPlayedCutscene = false;
 	}
@@ -105,7 +103,7 @@ class ExpurgationSong extends Song {
 		theDuration = duration;
 		interupt = false;
 
-		var gramlan:FlxSprite = FunkinSprite.createSparrow(0, 0,'mechanics/HP GREMLIN');
+		var gramlan = FunkinSprite.createSparrow(0, 0,'mechanics/HP GREMLIN');
 		gramlan.setGraphicSize(Std.int(gramlan.width * 0.76));
 		gramlan.cameras = [PlayState.instance.camHUD];
 		gramlan.zIndex = 1500;

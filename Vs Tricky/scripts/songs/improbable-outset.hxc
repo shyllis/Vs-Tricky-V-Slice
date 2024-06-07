@@ -5,7 +5,6 @@ import funkin.graphics.FunkinSprite;
 import funkin.audio.FunkinSound;
 import flixel.text.FlxText;
 import funkin.Paths;
-import flixel.FlxSprite;
 import flixel.util.FlxTimer;
 import flixel.tweens.FlxTween;
 import flixel.tweens.FlxEase;
@@ -25,14 +24,14 @@ class ImprobableOutsetSong extends Song {
  	var metal:FunkinSound;
   	var buildUp:FunkinSound;
 
-	var tstatic:FlxSprite;
+	var tstatic:FunkinSprite;
 	var spookyText:FlxText;
-	var MAINLIGHT:FlxSprite;
+	var MAINLIGHT:FunkinSprite;
 	
 	function onCreate(event:ScriptEvent) {
 		super.onCreate(event);
 
-		tstatic = new FlxSprite(0,0).loadGraphic(Paths.image('bgs/TrickyStatic'), true, 320, 180);
+		tstatic = new FunkinSprite(0,0).loadGraphic(Paths.image('bgs/TrickyStatic'), true, 320, 180);
 		tstatic.antialiasing = true;
 		tstatic.animation.add('static', [0, 1, 2], 24, true);
 		tstatic.animation.play('static');
@@ -48,7 +47,7 @@ class ImprobableOutsetSong extends Song {
 
 		spookyText.alpha = 0;
 		
-		MAINLIGHT = new FlxSprite(-470, -150).loadGraphic(Paths.image('bgs/default/hue'));
+		MAINLIGHT = FunkinSprite.create(-470, -150, Paths.image('bgs/default/hue'));
 		MAINLIGHT.alpha = 0.7;
 		MAINLIGHT.setGraphicSize(Std.int(MAINLIGHT.width * 0.9));
 		MAINLIGHT.blend = "screen";
@@ -100,16 +99,16 @@ class ImprobableOutsetSong extends Song {
 		var bfScared:Bool = false;
 		var faded:Bool = false;
 		var wat:Bool = false;
-		var trans:FlxSprite = FunkinSprite.createSparrow(-400, -760, 'Jaws');
+		var trans = FunkinSprite.createSparrow(-400, -760, 'Jaws');
 		trans.antialiasing = true;
 		trans.animation.addByPrefix("Close", "Jaws smol", 24, false);
 		trans.setGraphicSize(Std.int(trans.width * 1.6));
 		trans.scrollFactor.set();
 
-		var nevada:FlxSprite = FunkinSprite.createSparrow(1160, 780, 'cutscenes/somewhere');
+		var nevada = FunkinSprite.createSparrow(1160, 780, 'cutscenes/somewhere');
 		nevada.antialiasing = true;
 		nevada.animation.addByPrefix('nevada', 'somewhere idfk', 24, false);
-		var animation:FlxSprite = FunkinSprite.createSparrow(850, 450, 'cutscenes/intro');
+		var animation = FunkinSprite.createSparrow(850, 450, 'cutscenes/intro');
 		animation.antialiasing = true;
 		animation.animation.addByPrefix('fuckyou', 'Symbol', 24, false);
 		animation.setGraphicSize(Std.int(animation.width * 1.2));
@@ -119,13 +118,13 @@ class ImprobableOutsetSong extends Song {
 		
 		PlayState.instance.camCutscene.visible = true;
 		
-		var black:FlxSprite = new FlxSprite(-300, -120).makeGraphic(FlxG.width * 2, FlxG.height * 2, 0xFF130000);
+		var black = new FunkinSprite(-300, -120).makeSolidColor(FlxG.width * 2, FlxG.height * 2, 0xFF130000);
 		black.scrollFactor.set();
 		black.alpha = 0;
-		var black3:FlxSprite = new FlxSprite(-300, -120).makeGraphic(FlxG.width * 2, FlxG.height * 2, 0xFF130000);
+		var black3 = new FunkinSprite(-300, -120).makeSolidColor(FlxG.width * 2, FlxG.height * 2, 0xFF130000);
 		black3.scrollFactor.set();
 		black3.alpha = 0;
-		var red:FlxSprite = new FlxSprite(-300, -120).makeGraphic(FlxG.width * 2, FlxG.height * 2, 0xFF130000);
+		var red = new FunkinSprite(-300, -120).makeSolidColor(FlxG.width * 2, FlxG.height * 2, 0xFF130000);
 		red.scrollFactor.set();
 		red.alpha = 1;
 		

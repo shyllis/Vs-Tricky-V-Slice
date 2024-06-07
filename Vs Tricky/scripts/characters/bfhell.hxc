@@ -1,16 +1,18 @@
 import flixel.FlxG;
-import flixel.FlxSprite;
 import funkin.Paths;
 import funkin.play.character.MultiSparrowCharacter;
 import funkin.play.GameOverSubState;
+import funkin.graphics.FunkinSprite;
 import funkin.play.PlayState;
 
-class TrickyChar extends MultiSparrowCharacter {
+class BFPreloadDeathh extends MultiSparrowCharacter {
 	function new() {
-		super('tricky');
+		super('bfhell');
 	}
 	
 	function onCreate(event:ScriptEvent) {
+		FunkinSprite.cacheTexture(Paths.image('characters/signDeath'));
+
 		super.onCreate(event);
 
 		GameOverSubState.musicSuffix = 'Trickster';

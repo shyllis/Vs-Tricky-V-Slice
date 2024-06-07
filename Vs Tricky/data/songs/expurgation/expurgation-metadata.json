@@ -11,10 +11,8 @@
   },
   "playData": {
     "songVariations": [    ],
-    "difficulties": [
-      "hard"
-    ],
-    "characters": {
+    "difficulties": ["normal"],
+      "characters": {
       "player": "bftricky",
       "girlfriend": "gftied",
       "opponent": "exTricky",
@@ -22,8 +20,8 @@
       "altInstrumentals": [      ]
     },
     "stage": "auditorHell",
-    "noteStyle": "funkin",
-    "ratings": {    },
+    "noteStyle": "item",
+    "ratings": {"normal": 15},
     "previewStart": 0,
     "previewEnd": 0
   },

@@ -5,12 +5,13 @@ import funkin.graphics.FunkinSprite;
 import funkin.audio.FunkinSound;
 import flixel.text.FlxText;
 import funkin.Paths;
-import flixel.FlxSprite;
 import flixel.util.FlxTimer;
 import flixel.tweens.FlxTween;
 import flixel.tweens.FlxEase;
 import flixel.FlxG;
 import funkin.play.cutscene.VideoCutscene;
+import funkin.modding.PolymodHandler;
+import funkin.util.FileUtil;
 
 class MadnessSong extends Song {
   	var hasPlayedCutscene:Bool;
@@ -25,15 +26,18 @@ class MadnessSong extends Song {
   
 	public var cutsceneText:Array<String> = ["YOU DO NOT KILL CLOWN", "CLOWN KILLS YOU!!!!!!"];
 
-	var tstatic:FlxSprite;
+	var tstatic:FunkinSprite;
 	var spookyText:FlxText;
-	var MAINLIGHT:FlxSprite;
+	var MAINLIGHT:FunkinSprite;
 	var spookyRendered:Bool = false;
 	
 	function onCreate(event:ScriptEvent) {
+		FunkinSprite.cacheTexture(Paths.image('notes/NOTE_fire'));
+		FunkinSprite.cacheTexture(Paths.image('notes/SmokeSplash'));
+
 		super.onCreate(event);
 
-		tstatic = new FlxSprite(0,0).loadGraphic(Paths.image('bgs/TrickyStatic'), true, 320, 180);
+		tstatic = new FunkinSprite(0,0).loadGraphic(Paths.image('bgs/TrickyStatic'), true, 320, 180);
 		tstatic.antialiasing = true;
 		tstatic.animation.add('static', [0, 1, 2], 24, true);
 		tstatic.animation.play('static');
@@ -50,7 +54,7 @@ class MadnessSong extends Song {
 
 		spookyText.alpha = 0;
 		
-		MAINLIGHT = new FlxSprite(-470, -150).loadGraphic(Paths.image('bgs/default/hue'));
+		MAINLIGHT = new FunkinSprite(-470, -150).loadGraphic(Paths.image('bgs/default/hue'));
 		MAINLIGHT.alpha = 0.7;
 		MAINLIGHT.setGraphicSize(Std.int(MAINLIGHT.width * 0.9));
 		MAINLIGHT.blend = "screen";
@@ -58,7 +62,7 @@ class MadnessSong extends Song {
 		MAINLIGHT.antialiasing = true;
 		MAINLIGHT.scrollFactor.set(1.2, 1.2);
     
-    	hasPlayedCutscene = false;
+    	hasPlayedCutscene = false;	
 	}
 
   	public override function onCountdownStart(event:CountdownScriptEvent):Void {
@@ -66,17 +70,24 @@ class MadnessSong extends Song {
 	  
 		if (!PlayStatePlaylist.isStoryMode)
      		hasPlayedCutscene = true;
-      
+	  
     	if(!hasPlayedCutscene) { 
     		hasPlayedCutscene = true;
       
-      		//event.cancel();
+      		event.cancel();
 
-			//PlayState.instance.camHUD.visible = false;
+			PlayState.instance.camHUD.visible = false;
 
-			//PlayState.instance.isInCutscene = true;
+			PlayState.instance.isInCutscene = true;
 
-      		//VideoCutscene.play(Paths.videos('HankFuckingShootsTricky'));
+            for (id in PolymodHandler.getAllModIds()) {
+                var file:String = PolymodHandler.MOD_FOLDER + '/' + id + '/videos/HankFuckingShootsTricky.mp4';
+
+                if (FileUtil.doesFileExist(file)) {
+                    VideoCutscene.play(file);
+                    break;
+                }
+			}
 		}
   	}
 
@@ -99,11 +110,11 @@ class MadnessSong extends Song {
 
 		var done:Bool = false;
 
-		var black:FlxSprite = new FlxSprite(-300, -120).makeGraphic(FlxG.width * 2, FlxG.height * 2, 0xFFFFFFFF);
+		var black = new FunkinSprite(-300, -120).makeSolidColor(FlxG.width * 2, FlxG.height * 2, 0xFFFFFFFF);
 		black.scrollFactor.set();
 		black.alpha = 0;
 
-		var animation:FlxSprite = FunkinSprite.createSparrow(1100, 670, 'cutscenes/trickman');
+		var animation:FunkinSprite = FunkinSprite.createSparrow(1100, 670, 'cutscenes/trickman');
 		animation.antialiasing = true;
 		animation.animation.addByPrefix('cut1','Cutscene 1', 24, false);
 		animation.animation.addByPrefix('cut2','Cutscene 2', 24, false);
@@ -124,7 +135,7 @@ class MadnessSong extends Song {
 		var roar:FunkinSound = FunkinSound.load(Paths.sound('sound_clown_roar'));
 		var pillar:FunkinSound = FunkinSound.load(Paths.sound('firepillar'));
 
-		var fade:FlxSprite = new FlxSprite(-300, -120).makeGraphic(FlxG.width * 2, FlxG.height * 2, 0xFF130000);
+		var fade = new FunkinSprite(-300, -120).makeSolidColor(FlxG.width * 2, FlxG.height * 2, 0xFF130000);
 		fade.scrollFactor.set();
 		fade.alpha = 0;
 

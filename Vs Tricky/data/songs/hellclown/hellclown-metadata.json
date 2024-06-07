@@ -24,8 +24,8 @@
       "altInstrumentals": [      ]
     },
     "stage": "nevadaSpook",
-    "noteStyle": "funkin",
-    "ratings": {    },
+    "noteStyle": "item",
+    "ratings": { "easy": 4, "normal": 7, "hard": 11 },
     "previewStart": 0,
     "previewEnd": 0
   },

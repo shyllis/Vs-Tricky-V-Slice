@@ -3,29 +3,45 @@ import funkin.play.PlayState;
 import funkin.Paths;
 import funkin.play.cutscene.VideoCutscene;
 import funkin.play.cutscene.CutsceneType;
+import funkin.graphics.FunkinSprite;
 import funkin.play.PlayStatePlaylist;
+import funkin.modding.PolymodHandler;
+import funkin.util.FileUtil;
 
 class HellClownSong extends Song {
   	var hasPlayedCutscene:Bool;
+  	var hasPlayedSecondCutscene:Bool;
 
   	public function new(){
     	super('hellclown');
     
     	hasPlayedCutscene = false;
+    	hasPlayedSecondCutscene = false;
   	}
   
   	public override function onCountdownStart(event:CountdownScriptEvent):Void {
 		super.onCountdownStart(event);
 	  
 		if (!PlayStatePlaylist.isStoryMode)
-     		hasPlayedCutscene = true;
+    		hasPlayedCutscene = true;
       
     	if(!hasPlayedCutscene) { 
     		hasPlayedCutscene = true;
       
-      		//event.cancel();
+      		event.cancel();
 
-      		//VideoCutscene.play(Paths.videos('HELLCLOWN_ENGADGED'));
+			PlayState.instance.camHUD.visible = false;
+
+			PlayState.instance.isInCutscene = true;
+
+            for (id in PolymodHandler.getAllModIds()) {
+                var file:String = PolymodHandler.MOD_FOLDER + '/' + id + '/videos/HELLCLOWN_ENGADGED.mp4';
+
+                if (FileUtil.doesFileExist(file)) {
+                    VideoCutscene.play(file);
+                    break;
+                }
+			}
 		}
   	}
 
@@ -36,32 +52,42 @@ class HellClownSong extends Song {
   	}
 
   	function onCreate(event:ScriptEvent):Void {
+		FunkinSprite.cacheTexture(Paths.image('notes/NOTE_fire'));
+		FunkinSprite.cacheTexture(Paths.image('notes/SmokeSplash'));
+
     	super.onCreate(event);
 
     	hasPlayedCutscene = false;
   	}
 
-	function onSongEnd(event:CountdownScriptEvent) {
+  	public override function onSongEnd(event:CountdownScriptEvent):Void {
 		super.onSongEnd(event);
-
-     	hasPlayedCutscene = false;
 		
 		if (!PlayStatePlaylist.isStoryMode)
-     		hasPlayedCutscene = true;
+     		hasPlayedSecondCutscene = true;
       
-    	if(!hasPlayedCutscene) { 
-    		hasPlayedCutscene = true;
-      
-      		//event.cancel();
+    	if (!hasPlayedSecondCutscene) {
+			var bgSprite = new FunkinSprite(-100, -100);
+			bgSprite.makeSolidColor(2000, 2500, 0xFF000000);
+			bgSprite.cameras = [PlayState.instance.camHUD]; // Show over the HUD.
+			bgSprite.zIndex = 1000000;
+			PlayState.instance.add(bgSprite);
+			PlayState.instance.refresh();
 
-			//PlayState.instance.camHUD.visible = false;
+    		event.cancel();
 
-			//PlayState.instance.isInCutscene = true;
+            for (id in PolymodHandler.getAllModIds()) {
+                var file:String = PolymodHandler.MOD_FOLDER + '/' + id + '/videos/TricksterMan.mp4';
 
-			//PlayState.instance.currentStage.getBoyfriend().danceEvery = 0;
-			//PlayState.instance.currentStage.getDad().danceEvery = 0;
+                if (FileUtil.doesFileExist(file)) {
+                    VideoCutscene.play(file, CutsceneType.ENDING);
+                    break;
+                }
+			}
 
-      		//VideoCutscene.play(Paths.videos('HELLCLOWN_ENGADGED', CutsceneType.ENDING));
+    		hasPlayedSecondCutscene = true;
+    	} else {
+			hasPlayedSecondCutscene = false;
 		}
 	}
 }
